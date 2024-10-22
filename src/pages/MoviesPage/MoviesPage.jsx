@@ -19,6 +19,11 @@ const MoviesPage = () => {
     setIsLoading(true);
 
     const getSearch = async () => {
+      if (!keyWord) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const { results, total_pages } = await getMovieBySearch(keyWord, page);
         page === 1
@@ -37,6 +42,8 @@ const MoviesPage = () => {
 
   const handleSubmit = e => {
     e.preventDefault();
+    setPage(1);
+    setTotalPages(null);
 
     const form = e.target;
     const inputValue = form.elements.input.value;
@@ -77,16 +84,15 @@ const MoviesPage = () => {
       </form>
 
       {isLoading && <Loader />}
-
-      <>
-        {requestedFilms && <MovieList items={requestedFilms} />}
-        {totalPages !== page && <LoadMoreButton onLoadMore={onLoadMore} />}
-        {requestedFilms?.length === 0 && keyWord && (
-          <p className={css.altDescription}>
-            No films were found matching your search query.
-          </p>
-        )}
-      </>
+      {requestedFilms && <MovieList items={requestedFilms} />}
+      {totalPages && totalPages !== page && (
+        <LoadMoreButton onLoadMore={onLoadMore} />
+      )}
+      {requestedFilms?.length === 0 && (
+        <p className={css.altDescription}>
+          No films were found matching your search query.
+        </p>
+      )}
     </section>
   );
 };
